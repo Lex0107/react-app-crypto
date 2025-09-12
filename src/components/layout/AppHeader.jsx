@@ -1,7 +1,8 @@
-import { Layout, Select, Space, Button, Modal } from 'antd';
+import { Layout, Select, Space, Button, Modal, Drawer } from 'antd';
 import CryptoContext, { useCrypto } from '../../context/crypto-context';
 import { useEffect, useState } from 'react';
 import CoinInfoModal from '../CoinInfoModal';
+import AddAssetForm from '../AddAssetForm';
 
 const headerStyle = {
   width: '100%',
@@ -17,6 +18,7 @@ export default function AppHeader() {
   const [select, setSelect] = useState(false)
   const [modal, setModal] = useState(false)
   const [coin, setCoin] = useState(null)
+  const [drawer, setDrawer] = useState(null)
   const { crypto } = useCrypto()
 
   useEffect(() => {
@@ -54,10 +56,21 @@ export default function AppHeader() {
           </Space>
         )}
       />
-      <Button type="primary">Add Asset Text</Button>
+      <Button type="primary" onClick={() => setDrawer(true)}>Add Asset Text</Button>
 
       <Modal open={modal} onCancel={() => setModal(false)} footer={null}>
         <CoinInfoModal coin={coin}/>
       </Modal>
+
+      <Drawer
+        title="Basic Drawer"
+        width={600}
+        closable={{ 'aria-label': 'Close Button' }}
+        onClose={() => setDrawer(false)}
+        open={drawer}
+        destroyOnHidden
+      >
+        <AddAssetForm />
+      </Drawer>
     </Layout.Header>)
 }
