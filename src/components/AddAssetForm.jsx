@@ -10,7 +10,7 @@ import {
     DatePicker,
     Result,
 } from "antd"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useCrypto } from "../context/crypto-context"
 import CoinInfo from "./CoinInfo";
 
@@ -24,23 +24,26 @@ const validateMessages = {
     },
 };
 
-export default function AddAssetForm( onClose ) {
+export default function AddAssetForm( {onClose} ) {
     const [form] = Form.useForm()
-    const { crypto } = useCrypto()
+    const { crypto, addAsset } = useCrypto()
     const [coin, setCoin] = useState(null)
     const [submitted, setSubmitted] = useState(false)
+    const assetRef = useRef()
 
     if (submitted) {
-        <Result
-            status="success"
-            title="New Asset Added"
-            subTitle={` Added ${42} of ${coin.name} by price ${24}`}
-            extra={[
-                <Button type="primary" key="console" onClick={onClose}>
-                    Close
-                </Button>,
-            ]}
-        />
+        return (
+            <Result
+                status="success"
+                title="New Asset Added"
+                subTitle={` Added ${assetRef.current.amount} of ${coin.name} by price ${assetRef.current.price}`}
+                extra={[
+                    <Button type="primary" key="console" onClick={onClose}>
+                        Close
+                    </Button>,
+                ]}
+            />
+        )
     }
 
     if (!coin) {
@@ -66,7 +69,15 @@ export default function AddAssetForm( onClose ) {
     }
 
     function onFinish(values) {
+        const newAsset = {
+            id: coin.id,
+            amount: values.amount,
+            price: values.price,
+            ddate: values.date ? values.date.toDate() : new Date()
+        }
+        assetRef.current = newAsset
         setSubmitted(true)
+        addAsset(newAsset) 
     }
 
     function handelAmountChange(value) {
@@ -96,7 +107,7 @@ export default function AddAssetForm( onClose ) {
             onFinish={onFinish}
             validateMessages={validateMessages}
         >
-            <CoinInfo coin={coin}/>
+            <CoinInfo coin={coin} />
             <Divider />
             <Form.Item
                 label="Amount"
